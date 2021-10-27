@@ -1,2 +1,162 @@
-# HAL-LCEC-Twinsafe-Documentation
-Documentation of HAL with EterCAT and Twinsafe.
+<center><h3><b>Installation of lightweight LinuxCNC HAL in Raspberry Pi 4 + EtherCAT</b><h3/></center>
+
+### 📥 Download the pre-compiled image from LinuxCNC project website:
+http://www.linuxcnc.org/iso/linuxcnc-2.8.1-pi4.zip
+
+### 💾 Connect the microSD card in the computer and see the device name with:
+```lsblk -l```
+
+![image.png](attachment:f0c2156d-ca7f-4fff-b8ca-1441ac0c99a5.png)
+
+Now attach the microSD card in the computer:
+
+![image.png](attachment:e8451824-2e8b-473e-ad05-1b588e76dfdc.png)
+
+You should see sometihng like /dev/sda
+
+### 📦 Uncompress the zip file and write the image into the microSD card:
+```sudo dd if=2021-01-20-linuxcnc-pi4.img of=/dev/[your device]```
+
+
+## 🙌🏽 In case you want to do all the instalation headless (Wifi + SSH). Do the following steps in the microSD boot partition:
+
+### 📶 Enable SSH server in our Raspberry Pi.
+```
+touch ssh
+```
+
+### 📡 Configure the Wifi access:
+Creating a wpa_supplicant.conf file.
+```bash
+touch wpa_supplicant.conf
+```
+Adding configuration to our file (Copy paste it, and change the Wifi SSID and PASSWORD) :
+```bash
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+country=FI
+
+network={
+ssid="SSID"
+psk="PASSWORD"
+}
+```
+* Change SSID (your wifi name) and PASSWORD (wifi password) inside the double quotation marks 
+
+### Once we connect that to the power and we have internet access:
+First we update repositories, them we upgrade the softwares and after that we reboot the system:
+```bash
+sudo apt update -y
+```
+
+If you get this, press 'y' and them the enter key:
+```bash
+E: Repository 'http://raspbian.raspberrypi.org/raspbian buster InRelease' changed its 'Suite' value from 'stable' to 'oldstable'
+N: This must be accepted explicitly before updates for this repository can be applied. See apt-secure(8) manpage for details.
+Do you want to accept these changes and continue updating from this repository? [y/N] y
+```
+then continue:
+```bash
+sudo apt upgrade -y
+sudo reboot
+```
+If we get some prompt asking, just press `y` and enter key.
+
+### Installing the realtime kernel header:
+```bash
+sudo apt install linux-headers-4.19.71-rt24-v7l -y
+```
+
+### Installing development tools needed to install Etherlabmaster:
+```bash
+sudo apt install mercurial build-essential automake tree dkms bison flex -y
+```
+
+### Installing Etherlabmaster:
+```bash
+git clone https://github.com/icshwi/etherlabmaster
+cd etherlabmaster
+make init
+echo "ENABLE_CYCLES = NO" > configure/CONFIG_OPTIONS.local
+make build
+make install
+echo "ETHERCAT_MASTER0=eth0" > ethercatmaster.local
+make dkms_add
+make dkms_build
+make dkms_install
+make setup
+```
+
+### Because the files and libraries are in /opt/etherlab/ we linked it to /usr/lib/ and reboot.
+```bash
+sudo ln -s /opt/etherlab/lib/lib* /usr/lib/
+sudo reboot
+```
+
+### At this point we have the EtherCAT master working and running everytime the system starts.
+Have a try with the following command:
+```bash
+ethercat master
+```
+
+### Installing packages needed for HAL:
+```bash
+sudo apt install libmodbus-dev libusb-1.0 libglib2.0-dev yapps2 libreadline-gplv2-dev tcl8.6-dev tclx8.4 tk8.6-dev libboost-python-dev
+```
+
+### Downloading HAL (Hardware Abstraction Layer):
+Because we place HAl in /opt/ we need to change the user access to it and not use always root permisions.
+```bash
+sudo git clone https://github.com/rokokoo/hal_core.git /opt/hal-core
+sudo chown -R pi:pi /opt/hal-core/
+/opt/hal-core/./make
+```
+
+### Remove halcmd that already comes with the Rpi 4 image and link our new:
+```bash
+sudo rm /usr/bin/halcmd
+sudo ln -s bin/halcmd /usr/bin/halcmd
+```
+
+### To full STOP halcmd:
+If you use the same image provide here
+Due right now in hal-core do not have **halrun**, if we want to clean the hal enviroment we need to run the following:
+```bash
+/opt/hal-core/bin/./halcmd stop
+kill `pgrep rtapi_app`
+kill `pgrep lcec_conf`
+```
+
+At this point we have everything needed to launch our EtherCAT master + HAL....
+
+## Add EtherCAT configuration:
+
+We have to pain attention in our actual Beckhoff EtherCAT configuration left to right in order to write those up to down like this example:
+
+<b>hal_core_configuration.yaml</b>
+
+```yaml
+ETHERCAT:
+  MASTERIDX:  '0'
+  APPTIMEPERIOD:  '1000000'
+  REFCLOCKSYNCCYCLES:  '-1'
+  EK1100:
+  - EL1008
+  - EL1008
+  - EL1008
+  - EL1008
+  - EL2008
+  - EL2008
+  - EL7342
+  - EL7342
+  - EL9576
+  - EL6900
+  - EL1904
+  - EL2904
+  - EL9505
+```
+
+Once we have that we are able to run our hal-core and check all the I/O we have in order to map those to our nededs and from that create the ROS topics as the following example.
+
+## Configuration to remap our pins and create ROS topics:
+
