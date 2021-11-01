@@ -1,9 +1,11 @@
 <center><h3><b>Installation of lightweight LinuxCNC HAL in Raspberry Pi 4 + EtherCAT</b><h3/></center>
 
-### 📥 Download the pre-compiled image from LinuxCNC project website:
+# 💾 Preparing the MicroSD image:  
+  
+### Download the pre-compiled image from LinuxCNC project website:
 http://www.linuxcnc.org/iso/linuxcnc-2.8.1-pi4.zip
 
-### 💾 Connect the microSD card in the computer and see the device name with:
+### Connect the microSD card in the computer and see the device name with:
 ```lsblk -l```
 
 ![image.png](images/index.png)
@@ -14,11 +16,11 @@ Now attach the microSD card in the computer:
 
 You should see sometihng like /dev/sda
 
-### 📦 Uncompress the zip file and write the image into the microSD card:
+### Uncompress the zip file and write the image into the microSD card:
 ```sudo dd if=2021-01-20-linuxcnc-pi4.img of=/dev/[your device]```
 
 
-## 🙌🏽 In case you want to do all the instalation headless (Wifi + SSH). Do the following steps in the microSD boot partition:
+# 🙌🏿 In case you want to do all the instalation headless (Wifi + SSH). Do the following steps in the microSD boot partition:
 
 ### 📶 Enable SSH server in our Raspberry Pi.
 ```
@@ -43,6 +45,9 @@ psk="PASSWORD"
 ```
 * Change SSID (your wifi name) and PASSWORD (wifi password) inside the double quotation marks 
 
+  
+# 📥 Start HAL-Core installation:  
+  
 ### Once we connect that to the power and we have internet access:
 First we update repositories, them we upgrade the softwares and after that we reboot the system:
 ```bash
