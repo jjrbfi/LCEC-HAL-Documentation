@@ -165,3 +165,28 @@ Once we have that we are able to run our hal-core and check all the I/O we have 
 
 ## Configuration to remap our pins and create ROS topics:
 
+
+  
+  
+---
+  
+# Working with motors EL7342
+  
+To start moving the motors we have first to enable them with:
+  
+In our case we have two EL7342.
+  
+```bash
+halcmd setp lcec.0.motor1.srv-1-enable 1
+halcmd setp lcec.0.motor1.srv-0-enable 1
+halcmd setp lcec.0.motor2.srv-1-enable 1
+halcmd setp lcec.0.motor2.srv-0-enable 1
+```
+  
+To send command to move:
+  
+```bash
+halcmd setp lcec.0.motor1.srv-0-cmd 0.005 # Positive value
+halcmd setp lcec.0.motor1.srv-0-cmd -0.005 # Negative
+halcmd setp lcec.0.motor1.srv-0-cmd 0 # Stop moving
+```
