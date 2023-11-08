@@ -132,61 +132,7 @@ kill `pgrep rtapi_app`
 kill `pgrep lcec_conf`
 ```
 
-At this point we have everything needed to launch our EtherCAT master + HAL....
-
-## Add EtherCAT configuration:
-
-We have to pain attention in our actual Beckhoff EtherCAT configuration left to right in order to write those up to down like this example:
-
-<b>hal_core_configuration.yaml</b>
-
-```yaml
-ETHERCAT:
-  MASTERIDX:  '0'
-  APPTIMEPERIOD:  '1000000'
-  REFCLOCKSYNCCYCLES:  '-1'
-  EK1100:
-  - EL1008
-  - EL1008
-  - EL1008
-  - EL1008
-  - EL2008
-  - EL2008
-  - EL7342
-  - EL7342
-  - EL9576
-  - EL6900
-  - EL1904
-  - EL2904
-  - EL9505
-```
-
-Once we have that we are able to run our hal-core and check all the I/O we have in order to map those to our nededs and from that create the ROS topics as the following example.
-
-## Configuration to remap our pins and create ROS topics:
+At this point we have everything needed to launch our EtherCAT master + HAL ...
 
 
-  
-  
----
-  
-# Working with motors EL7342
-  
-To start moving the motors we have first to enable them with:
-  
-In our case we have two EL7342.
-  
-```bash
-halcmd setp lcec.0.motor1.srv-1-enable 1
-halcmd setp lcec.0.motor1.srv-0-enable 1
-halcmd setp lcec.0.motor2.srv-1-enable 1
-halcmd setp lcec.0.motor2.srv-0-enable 1
-```
-  
-To send command to move:
-  
-```bash
-halcmd setp lcec.0.motor1.srv-0-cmd 0.005 # Positive value
-halcmd setp lcec.0.motor1.srv-0-cmd -0.005 # Negative
-halcmd setp lcec.0.motor1.srv-0-cmd 0 # Stop moving
-```
+##### Source: https://forum.linuxcnc.org
