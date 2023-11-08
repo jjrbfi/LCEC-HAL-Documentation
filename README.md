@@ -112,7 +112,7 @@ sudo apt install libmodbus-dev libusb-1.0 libglib2.0-dev yapps2 libreadline-gplv
 ### Downloading HAL (Hardware Abstraction Layer):
 Because we place HAl in /opt/ we need to change the user access to it and not use always root permisions.
 ```bash
-sudo git clone https://github.com/rokokoo/hal_core.git /opt/hal-core
+sudo git clone https://github.com/jjrbfi/lcnc_hal-core_ros.git /opt/hal-core
 sudo chown -R pi:pi /opt/hal-core/
 /opt/hal-core/./make
 ```
