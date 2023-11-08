@@ -8,11 +8,11 @@ http://www.linuxcnc.org/iso/linuxcnc-2.8.1-pi4.zip
 ### Connect the microSD card in the computer and see the device name with:
 ```lsblk -l```
 
-![image.png](images/index.png)
+<img src="images/index.png" alt="image" width="400"/>
 
 Now attach the microSD card in the computer:
 
-![image.png](images/index2.png)
+<img src="images/index2.png" alt="image" width="400"/>
 
 You should see sometihng like /dev/sda
 
